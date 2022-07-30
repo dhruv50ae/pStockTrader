@@ -1,16 +1,35 @@
-# This is a sample Python script.
+import requests
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+STOCK_NAME = "TSLA"
+COMPANY_NAME = "Tesla Inc"
 
+STOCK_ENDPOINT = "https://www.alphavantage.co/query"
+NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+STOCK_API_KEY = "RKYFNF5Q5ZBQ8CNS"
+# https://newsapi.org/
+# Use twilio.com/docs/sms/quickstart/python
 
+stockParams = {
+    "function": "TIME_SERIES_DAILY", "symbol": STOCK_NAME, "apikey": STOCK_API_KEY
+}
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+response = requests.get(url=STOCK_ENDPOINT, params=stockParams)
+data = response.json()["Time Series (Daily)"]
+dataList = [value for (key, value) in data.items()]
+yesterdayData = dataList[0]
+yesterdayClosingPrice = yesterdayData["4. close"]
+print(yesterdayClosingPrice)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+dayBeforeYesterdayData = dataList[1]
+dayBeforeYesterdayClosingPrice = dayBeforeYesterdayData["4. close"]
+print(dayBeforeYesterdayClosingPrice)
+
+difference = abs(float(yesterdayClosingPrice) - float(dayBeforeYesterdayClosingPrice))
+print(difference)
+
+diffPercent = (difference / float(yesterdayClosingPrice)) * 100
+print(diffPercent)
+
+if diffPercent > 5:
+    print("Get news")
